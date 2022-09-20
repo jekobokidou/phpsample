@@ -1,12 +1,27 @@
-name: Playbook to deploy app on target Server
-hosts: webserver
-become: yes
-become_user: root
-tasks:
-   - name: Clone a github repository
-     git:
-       repo: https://github.com/jekobokidou/phpsample.git
-       dest: /var/www/html
-       clone: yes
-       update: yes
+---
+- name: Update web servers
+  hosts: webservers
+  remote_user: root
+
+  tasks:
+  - name: Ensure apache is at the latest version
+    ansible.builtin.yum:
+      name: httpd
+      state: latest
+  - name: Write the apache config file
+    ansible.builtin.template:
+      src: /srv/httpd.j2
+      dest: /etc/httpd.conf
+---
+- name: Playbook to deploy app on target Server
+  hosts: webserver
+  become: yes
+  become_user: root
+  tasks:
+  - name: Clone a github repository
+    git:
+      repo: https://github.com/jekobokidou/phpsample.git
+      dest: /var/www/html
+      clone: yes
+      update: yes
        
